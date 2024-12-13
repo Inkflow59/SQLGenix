@@ -22,6 +22,12 @@ class SQLSelect {
     private $conditions = [];
     
     /**
+     * Joins for the select statement.
+     * @var array
+     */
+    private $joins = [];
+    
+    /**
      * Set the columns to be selected.
      * 
      * @param array $columns Columns to select.
@@ -55,12 +61,67 @@ class SQLSelect {
     }
     
     /**
+     * Add an INNER JOIN to the select statement.
+     * 
+     * @param string $table Table to join.
+     * @param string $condition Join condition.
+     * @return SQLSelect
+     */
+    public function innerJoin($table, $condition) {
+        $this->joins[] = "INNER JOIN $table ON $condition";
+        return $this;
+    }
+
+    /**
+     * Add a LEFT JOIN to the select statement.
+     * 
+     * @param string $table Table to join.
+     * @param string $condition Join condition.
+     * @return SQLSelect
+     */
+    public function leftJoin($table, $condition) {
+        $this->joins[] = "LEFT JOIN $table ON $condition";
+        return $this;
+    }
+
+    /**
+     * Add a RIGHT JOIN to the select statement.
+     * 
+     * @param string $table Table to join.
+     * @param string $condition Join condition.
+     * @return SQLSelect
+     */
+    public function rightJoin($table, $condition) {
+        $this->joins[] = "RIGHT JOIN $table ON $condition";
+        return $this;
+    }
+    
+    /**
      * Build the SQL select statement.
      * 
      * @return string
      */
     public function build() {
         $query = "SELECT " . implode(", ", $this->columns) . " FROM " . $this->table;
+        if (!empty($this->joins)) {
+            $query .= ' ' . implode(' ', $this->joins);
+        }
+        if (!empty($this->conditions)) {
+            $query .= " WHERE " . implode(" AND ", $this->conditions);
+        }
+        return $query;
+    }
+    
+    /**
+     * Get the constructed SQL select statement.
+     * 
+     * @return string
+     */
+    public function getQuery() {
+        $query = "SELECT " . implode(", ", $this->columns) . " FROM " . $this->table;
+        if (!empty($this->joins)) {
+            $query .= ' ' . implode(' ', $this->joins);
+        }
         if (!empty($this->conditions)) {
             $query .= " WHERE " . implode(" AND ", $this->conditions);
         }
@@ -78,18 +139,5 @@ class SQLSelect {
         $result = $db->executeQuery($query);
         $db->getLogger()->log("Execution of query: $query"); // Log the query execution
         return $result;
-    }
-    
-    /**
-     * Get the constructed SQL select statement.
-     * 
-     * @return string
-     */
-    public function getQuery() {
-        $query = 'SELECT ' . implode(', ', $this->columns) . ' FROM ' . $this->table;
-        if (!empty($this->conditions)) {
-            $query .= ' WHERE ' . implode(' AND ', $this->conditions);
-        }
-        return $query;
     }
 }
