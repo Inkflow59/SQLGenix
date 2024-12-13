@@ -1,6 +1,7 @@
 # SQLFlow
 
-SQLFlow is a powerful PHP-based library designed to simplify database operations through a clean and intuitive interface. This library provides easy-to-use methods for executing SQL commands, making it an ideal choice for developers looking to streamline their database interactions.
+## Description
+SQLFlow is a powerful tool designed to facilitate the interaction between SQL databases and data analysis workflows. It allows users to execute SQL queries, visualize results, and integrate with various data sources seamlessly.
 
 ## Features
 
@@ -10,9 +11,31 @@ SQLFlow is a powerful PHP-based library designed to simplify database operations
 - **Error Handling**: Comprehensive error handling to ensure robust application performance.
 
 ## Installation
+To install SQLFlow, follow these steps:
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/SQLFlow.git
+   ```
+2. Navigate to the project directory:
+   ```bash
+   cd SQLFlow
+   ```
+3. Install the required dependencies:
+   ```bash
+   composer install
+   ```
 
-To get started with SQLFlow, clone the repository and include the necessary files in your PHP project:
-
-```bash
-git clone https://github.com/yourusername/SQLFlow.git
+## Usage
+To use SQLFlow, you can start by connecting to your database:
+```php
+require 'src/DatabaseConnexion.php';
+$connection = new DatabaseConnexion();
+$connection->connect();
 ```
+After establishing a connection, you can execute SQL queries and retrieve results.
+
+## Contributing
+Contributions are welcome! Please follow these steps to contribute:
+1. Fork the repository.
+2. Create a new branch for your feature or bug fix.
+3. Submit a pull request detailing your changes.
