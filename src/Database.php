@@ -1,7 +1,7 @@
 <?php
 require_once 'Logger.php';
 
-class DatabaseConnexion {
+class Database {
     private $pdo;
     private $logger;
     

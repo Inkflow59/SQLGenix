@@ -131,10 +131,10 @@ class SQLSelect {
     /**
      * Execute the SQL select statement.
      * 
-     * @param DatabaseConnexion $db Database connection object.
+     * @param Database $db Database connection object.
      * @return mixed
      */
-    public function execute(DatabaseConnexion $db) {
+    public function execute(Database $db) {
         $query = $this->getQuery();
         $result = $db->executeQuery($query);
         $db->getLogger()->log("Execution of query: $query"); // Log the query execution

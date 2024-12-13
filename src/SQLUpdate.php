@@ -70,10 +70,10 @@ class SQLUpdate {
     /**
      * Execute the SQL update statement.
      * 
-     * @param DatabaseConnexion $db Database connection object.
+     * @param Database $db Database connection object.
      * @return mixed
      */
-    public function execute(DatabaseConnexion $db) {
+    public function execute(Database $db) {
         $query = $this->build();
         $params = array_values($this->set);
         $result = $db->executeQuery($query, $params);

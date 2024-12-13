@@ -7,6 +7,8 @@
  *
  * @package SQLFlow
  */
+require_once 'Database.php';
+
 class SQLExecutor {
     /**
      * The PDO instance used for database connections.
@@ -25,11 +27,15 @@ class SQLExecutor {
     /**
      * Constructs a new SQLExecutor instance.
      *
-     * @param PDO $pdo The PDO instance to use for database connections.
+     * @param string $host The database host.
+     * @param string $db The database name.
+     * @param string $user The database user.
+     * @param string $pass The database password.
      * @param Logger $logger The logger instance to use for logging.
      */
-    public function __construct($pdo, $logger) {
-        $this->pdo = $pdo;
+    public function __construct($host, $db, $user, $pass, $logger) {
+        $database = new Database($host, $db, $user, $pass);
+        $this->pdo = $database->getConnection();
         $this->logger = $logger;
     }
 
