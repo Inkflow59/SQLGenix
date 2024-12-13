@@ -1,5 +1,5 @@
 {
-    "name": "sqlflow/sqlflow",
+    "name": "sqlgenix/sqlgenix",
     "description": "A PHP library that let you build easily your SQL queries to build your dynamics websites easier",
     "type": "library",
     "require-dev": {
@@ -14,5 +14,11 @@
         "psr-4": {
             "SQLFlow\\Tests\\": "tests/"
         }
-    }
+    },
+    "authors": [
+        {
+            "name": "Inkflow (Tom CUCHEROSSET)",
+            "email": "ink@hos-team.fr"
+        }
+    ]
 }
