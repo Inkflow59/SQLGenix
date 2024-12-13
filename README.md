@@ -1,7 +1,7 @@
-# SQLFlow
+# SQLGenix
 
 ## Description
-SQLFlow is a powerful tool designed to facilitate the interaction between SQL databases and data analysis workflows. It allows users to execute SQL queries, visualize results, and integrate with various data sources seamlessly.
+SQLGenix is a powerful tool designed to facilitate the interaction between SQL databases and data analysis workflows. It allows users to execute SQL queries, visualize results, and integrate with various data sources seamlessly.
 
 ## Features
 
@@ -11,14 +11,14 @@ SQLFlow is a powerful tool designed to facilitate the interaction between SQL da
 - **Error Handling**: Comprehensive error handling to ensure robust application performance.
 
 ## Installation
-To install SQLFlow, follow these steps:
+To install SQLGenix, follow these steps:
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/SQLFlow.git
+   git clone https://github.com/yourusername/SQLGenix.git
    ```
 2. Navigate to the project directory:
    ```bash
-   cd SQLFlow
+   cd SQLGenix
    ```
 3. Install the required dependencies:
    ```bash
@@ -26,7 +26,7 @@ To install SQLFlow, follow these steps:
    ```
 
 ## Usage
-To use SQLFlow, you can start by connecting to your database:
+To use SQLGenix, you can start by connecting to your database:
 ```php
 require 'src/DatabaseConnexion.php';
 $connection = new DatabaseConnexion();
