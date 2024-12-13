@@ -25,6 +25,10 @@ class DatabaseConnexion {
         $this->pdo = null;
     }
     
+    public function isConnected(): bool {
+        return $this->pdo !== null;
+    }
+    
     public function executeQuery($query, $params = []) {
         try {
             $stmt = $this->pdo->prepare($query);
