@@ -6,14 +6,14 @@ class Database {
     private $logger;
     
     public function __construct($host, $db, $user, $pass) {
-        $this->logger = new Logger(); // Instance de Logger
+        $this->logger = new Logger(); // Logger instance
         try {
             $this->pdo = new PDO("mysql:host=$host;dbname=$db", $user, $pass);
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $this->logger->log("Connexion réussie à la base de données $db");
+            $this->logger->log("Successfully connected to the database $db");
         } catch (PDOException $e) {
-            $this->logger->log("Erreur de connexion: " . $e->getMessage());
-            echo "Erreur de connexion: " . $e->getMessage();
+            $this->logger->log("Connection error: " . $e->getMessage());
+            echo "Connection error: " . $e->getMessage();
         }
     }
     
@@ -35,8 +35,8 @@ class Database {
             $stmt->execute($params);
             return $stmt;
         } catch (PDOException $e) {
-            $this->logger->log("Erreur lors de l'exécution de la requête: " . $e->getMessage());
-            echo "Erreur lors de l'exécution de la requête: " . $e->getMessage();
+            $this->logger->log("Error executing the query: " . $e->getMessage());
+            echo "Error executing the query: " . $e->getMessage();
             return null;
         }
     }

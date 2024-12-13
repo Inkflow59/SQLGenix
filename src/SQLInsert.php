@@ -22,16 +22,11 @@ class SQLInsert {
     private $values = [];
     
     /**
-     * Constructor to initialize properties if needed.
-     * 
-     * @throws Exception If an error occurs during initialization.
+     * Constructor to initialize SQLInsert with database connection
+     * @param Database $db Database connection instance
      */
-    public function __construct() {
-        try {
-            // Initialize properties if needed
-        } catch (Exception $e) {
-            throw new Exception('Error during initialization: ' . $e->getMessage());
-        }
+    public function __construct($db) {
+        $this->db = $db;
     }
     
     /**

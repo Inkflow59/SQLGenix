@@ -27,16 +27,11 @@ class SQLExecutor {
     /**
      * Constructs a new SQLExecutor instance.
      *
-     * @param string $host The database host.
-     * @param string $db The database name.
-     * @param string $user The database user.
-     * @param string $pass The database password.
-     * @param Logger $logger The logger instance to use for logging.
+     * @param Database $db The Database instance to use for executing queries.
      */
-    public function __construct($host, $db, $user, $pass, $logger) {
-        $database = new Database($host, $db, $user, $pass);
-        $this->pdo = $database->getConnection();
-        $this->logger = $logger;
+    public function __construct(Database $db) {
+        $this->pdo = $db->getConnection(); // Assuming getConnection() returns a PDO instance
+        $this->logger = new Logger(); // Initialize a default logger or pass it as a parameter if needed
     }
 
     /**

@@ -22,6 +22,20 @@ class SQLUpdate {
     private $where = [];
     
     /**
+     * Database connection instance
+     * @var Database
+     */
+    private $db;
+
+    /**
+     * Constructor to initialize SQLUpdate with database connection
+     * @param Database $db Database connection instance
+     */
+    public function __construct($db) {
+        $this->db = $db;
+    }
+
+    /**
      * Set the table name for the update statement.
      * 
      * @param string $table Table name.
@@ -70,17 +84,16 @@ class SQLUpdate {
     /**
      * Execute the SQL update statement.
      * 
-     * @param Database $db Database connection object.
      * @return mixed
      */
-    public function execute(Database $db) {
+    public function execute() {
         $query = $this->build();
         $params = array_values($this->set);
-        $result = $db->executeQuery($query, $params);
+        $result = $this->db->executeQuery($query, $params);
         if ($result === null) {
             throw new Exception("Erreur lors de l'exécution de la requête UPDATE");
         }
-        $db->getLogger()->log("Exécution de la requête : $query");
+        $this->db->getLogger()->log("Exécution de la requête : $query");
         return $result->rowCount();
     }
     

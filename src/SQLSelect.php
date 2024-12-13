@@ -16,6 +16,12 @@ class SQLSelect {
     private $table;
     
     /**
+     * Database connection instance.
+     * @var Database
+     */
+    private $db;
+    
+    /**
      * Conditions for the select statement.
      * @var array
      */
@@ -26,6 +32,14 @@ class SQLSelect {
      * @var array
      */
     private $joins = [];
+    
+    /**
+     * Constructor
+     * @param Database $db Database connection instance
+     */
+    public function __construct(Database $db) {
+        $this->db = $db;
+    }
     
     /**
      * Set the columns to be selected.
@@ -131,13 +145,12 @@ class SQLSelect {
     /**
      * Execute the SQL select statement.
      * 
-     * @param Database $db Database connection object.
      * @return mixed
      */
-    public function execute(Database $db) {
+    public function execute() {
         $query = $this->getQuery();
-        $result = $db->executeQuery($query);
-        $db->getLogger()->log("Execution of query: $query"); // Log the query execution
+        $result = $this->db->executeQuery($query);
+        $this->db->getLogger()->log("Execution of query: $query"); // Log the query execution
         return $result;
     }
 }

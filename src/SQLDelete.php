@@ -16,6 +16,14 @@ class SQLDelete {
     private $where = [];
     
     /**
+     * Constructor to initialize SQLDelete with database connection
+     * @param Database $db Database connection instance
+     */
+    public function __construct($db) {
+        $this->db = $db;
+    }
+    
+    /**
      * Set the table name for the delete statement.
      * 
      * @param string $table Table name.
