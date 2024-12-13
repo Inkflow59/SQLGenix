@@ -7,18 +7,18 @@
     },
     "autoload": {
         "psr-4": {
-            "SQLFlow\\": "src/"
+            "SQLGenix\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "SQLFlow\\Tests\\": "tests/"
+            "SQLGenix\\Tests\\": "tests/"
         }
     },
     "authors": [
         {
             "name": "Inkflow (Tom CUCHEROSSET)",
-            "email": "ink@hos-team.fr"
+            "email": "tomcucherosset@hotmail.fr"
         }
     ]
 }
