@@ -13,14 +13,26 @@ class SQLUpdate {
      * Columns and their new values for the update statement.
      * @var array
      */
-    private $set = [];
+    private $updates = [];
     
     /**
      * Conditions for the update statement.
      * @var array
      */
-    private $where = [];
+    private $conditions = [];
     
+    /**
+     * Subqueries for the update statement.
+     * @var array
+     */
+    private $subqueries = [];
+    
+    /**
+     * Subquery for the update statement.
+     * @var Subquery
+     */
+    private $subquery;
+
     /**
      * Database connection instance
      * @var Database
@@ -47,27 +59,129 @@ class SQLUpdate {
     }
     
     /**
-     * Set the columns and their new values for the update statement.
+     * Add a CASE statement to the SET clause of the update statement.
      * 
-     * @param array $columns Columns and their new values.
+     * @param string $column Column name to update.
+     * @param array $cases Array of when-then pairs.
+     * @param string $default Default value.
      * @return SQLUpdate
      */
-    public function set($columns) {
-        $this->set = $columns;
+    public function case($column, $cases, $default = null) {
+        $caseStatement = "CASE ";
+        foreach ($cases as $when => $then) {
+            $caseStatement .= "WHEN {$when} THEN {$then} ";
+        }
+        if ($default !== null) {
+            $caseStatement .= "ELSE {$default} ";
+        }
+        $caseStatement .= "END";
+        $this->set($column, $caseStatement);
+        return $this;
+    }
+
+    /**
+     * Add an IF statement to the WHERE clause.
+     * 
+     * @param string $condition Condition to evaluate.
+     * @param string $thenResult Result if condition is true.
+     * @param string $elseResult Result if condition is false.
+     * @return SQLUpdate
+     */
+    public function if($condition, $thenResult, $elseResult = null) {
+        $ifStatement = "IF ({$condition}) THEN {$thenResult} ";
+        if ($elseResult !== null) {
+            $ifStatement .= "ELSE {$elseResult} ";
+        }
+        $this->conditions[] = $ifStatement;
+        return $this;
+    }
+
+    /**
+     * Set the column values for the update statement.
+     * 
+     * @param string $column Column name.
+     * @param mixed $value Value to set.
+     * @return SQLUpdate
+     */
+    public function set($column, $value) {
+        $this->updates[$column] = $value;
         return $this;
     }
     
     /**
-     * Set the conditions for the update statement.
+     * Add a WHERE clause to the update statement.
      * 
-     * @param string $condition Condition for the update statement.
+     * @param string $condition Condition for the WHERE clause.
      * @return SQLUpdate
      */
     public function where($condition) {
-        $this->where = $condition;
+        $this->conditions[] = $condition;
         return $this;
     }
     
+    /**
+     * Add a subquery to the update statement.
+     * 
+     * @param string $subquery The subquery to include.
+     * @param string $alias Optional alias for the subquery.
+     * @return SQLUpdate
+     */
+    public function subquery($subquery, $alias = null) {
+        if ($alias) {
+            $this->subqueries[] = "($subquery) AS $alias";
+        } else {
+            $this->subqueries[] = "($subquery)";
+        }
+        return $this;
+    }
+    
+    /**
+     * Add an EXISTS condition to the WHERE clause.
+     * 
+     * @param string $subquery The subquery to check for existence.
+     * @return SQLUpdate
+     */
+    public function exists($subquery) {
+        $this->conditions[] = "EXISTS ($subquery)";
+        return $this;
+    }
+    
+    /**
+     * Add a subquery to the WHERE clause.
+     * 
+     * @param string $subquery The subquery to include.
+     * @param string $alias Optional alias for the subquery.
+     * @return SQLUpdate
+     */
+    public function whereSubquery($subquery, $alias = null) {
+        if ($alias) {
+            $this->conditions[] = "($subquery) AS $alias";
+        } else {
+            $this->conditions[] = "($subquery)";
+        }
+        return $this;
+    }
+    
+    /**
+     * Set the subquery for the update statement.
+     * 
+     * @param Subquery $subquery Subquery instance.
+     * @return SQLUpdate
+     */
+    public function setSubquery(Subquery $subquery) {
+        $this->subquery = $subquery;
+        return $this;
+    }
+
+    /**
+     * Get the subquery for the update statement.
+     * 
+     * @return Subquery
+     */
+    public function getSubquery() {
+        return $this->subquery;
+    }
+
     /**
      * Build the SQL update statement.
      * 
@@ -75,10 +189,21 @@ class SQLUpdate {
      */
     public function build() {
         $setClause = implode(", ", array_map(function($col, $val) {
-            return "$col = ?";
-        }, array_keys($this->set), $this->set));
-
-        return "UPDATE " . $this->table . " SET " . $setClause . " WHERE " . $this->where;
+            return "$col = $val";
+        }, array_keys($this->updates), $this->updates));
+        $whereClause = implode(" AND ", $this->conditions);
+        $subqueryClause = implode(", ", $this->subqueries);
+        $query = "UPDATE " . $this->table . " SET " . $setClause;
+        if (!empty($this->subqueries)) {
+            $query .= " FROM " . $subqueryClause;
+        }
+        if (!empty($this->conditions)) {
+            $query .= " WHERE " . $whereClause;
+        }
+        if ($this->subquery) {
+            $query .= " WHERE EXISTS (" . $this->subquery->getQuery() . ")";
+        }
+        return $query;
     }
     
     /**
@@ -88,8 +213,7 @@ class SQLUpdate {
      */
     public function execute() {
         $query = $this->build();
-        $params = array_values($this->set);
-        $result = $this->db->executeQuery($query, $params);
+        $result = $this->db->executeQuery($query);
         if ($result === null) {
             throw new Exception("Erreur lors de l'exécution de la requête UPDATE");
         }
@@ -104,13 +228,25 @@ class SQLUpdate {
      */
     public function getQuery() {
         $setClause = implode(', ', array_map(function($col, $val) use ($this) {
-            return "$col = '$val'";
-        }, array_keys($this->set), $this->set));
+            return "$col = $val";
+        }, array_keys($this->updates), $this->updates));
         
         $query = 'UPDATE ' . $this->table . ' SET ' . $setClause;
-        if (!empty($this->where)) {
-            $query .= ' WHERE ' . $this->where;
+
+        $subqueryClause = implode(", ", $this->subqueries);
+
+        if (!empty($this->subqueries)) {
+            $query .= " FROM " . $subqueryClause;
         }
+
+        if (!empty($this->conditions)) {
+            $query .= ' WHERE ' . implode(" AND ", $this->conditions);
+        }
+
+        if ($this->subquery) {
+            $query .= " WHERE EXISTS (" . $this->subquery->getQuery() . ")";
+        }
+
         return $query;
     }
 }

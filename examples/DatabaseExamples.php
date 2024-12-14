@@ -43,4 +43,28 @@ class DatabaseExamples {
         }
         echo 'Query executed successfully.';
     }
+
+    public function testSelectData() {
+        $db = new Database('localhost', 'your_database', 'your_username', 'your_password');
+        $select = new SQLSelect($db);
+        $result = $select->from('users')->where('id = 1')->execute();
+        if (!$result) {
+            throw new Exception('Data selection failed.');
+        }
+        print_r($result);
+        echo 'Selection successful.';
+    }
+
+    public function testUpdateData() {
+        $db = new Database('localhost', 'your_database', 'your_username', 'your_password');
+        $update = new SQLUpdate($db);
+        $result = $update->table('users')
+            ->set('name', 'Jane Doe')
+            ->where('id = 1')
+            ->execute();
+        if (!$result) {
+            throw new Exception('Data update failed.');
+        }
+        echo 'Update successful.';
+    }
 }
