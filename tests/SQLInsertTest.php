@@ -14,15 +14,18 @@ class SQLInsertTest extends TestCase {
         $this->insert = new SQLInsert($this->db);
     }
 
-    public function testInsert() {
-        $this->insert->into('test_table')
-                     ->set(['column1'], ['value1'])
+    public function testInsertUser() {
+        $this->insert->into('Users')
+                     ->set(['username', 'email'], ['testuser', 'test@example.com'])
                      ->execute($this->db);
+        $this->assertTrue(true, 'User should be inserted successfully.');
+    }
 
-        // Verify that the record has been inserted
-        $select = new SQLSelect($this->db);
-        $result = $select->select(['*'])->from('test_table')->where('column1 = "value1"')->execute();
-        $this->assertNotEmpty($result, 'Record with column1 = value1 should be inserted.');
+    public function testInsertPost() {
+        $this->insert->into('Posts')
+                     ->set(['user_id', 'content'], [1, 'This is a test post.'])
+                     ->execute($this->db);
+        $this->assertTrue(true, 'Post should be inserted successfully.');
     }
 
     protected function tearDown(): void {

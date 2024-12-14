@@ -1,16 +1,16 @@
 <?php
 class SelectExamples {
-    public function exampleSelectAll() {
-        $db = new Database('localhost', 'your_database', 'your_username', 'your_password');
+    public function exampleSelectAllUsers() {
+        $db = new Database('localhost', 'test_db', 'test_user', 'test_pass');
         $select = new SQLSelect($db);
-        $result = $select->from('users')->execute();
+        $result = $select->from('Users')->execute();
         print_r($result);
     }
 
-    public function exampleSelectWithCondition() {
-        $db = new Database('localhost', 'your_database', 'your_username', 'your_password');
+    public function exampleSelectAllPosts() {
+        $db = new Database('localhost', 'test_db', 'test_user', 'test_pass');
         $select = new SQLSelect($db);
-        $result = $select->from('users')->where('age > 18')->execute();
+        $result = $select->from('Posts')->execute();
         print_r($result);
     }
 }

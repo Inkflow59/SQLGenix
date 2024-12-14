@@ -1,11 +1,11 @@
 <?php
 class InsertExamples {
     public function exampleInsertUser() {
-        $db = new Database('localhost', 'your_database', 'your_username', 'your_password');
+        $db = new Database('localhost', 'test_db', 'test_user', 'test_pass');
         $insert = new SQLInsert($db);
-        $result = $insert->into('users')
-            ->set(['name', 'email'], ['Alice', 'alice@example.com'])
+        $result = $insert->into('Users')
+            ->set(['username', 'email'], ['Alice', 'alice@example.com'])
             ->execute($db);
-        echo 'Insertion successful.';
+        echo 'User insertion successful.';
     }
 }

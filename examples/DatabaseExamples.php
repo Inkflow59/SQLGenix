@@ -11,13 +11,19 @@ class DatabaseExamples {
     }
 
     public function testInsertData() {
-        $db = new Database('localhost', 'your_database', 'your_username', 'your_password');
+        $db = new Database('localhost', 'test_db', 'test_user', 'test_pass');
         $insert = new SQLInsert($db);
-        $result = $insert->into('users')
-            ->set(['name', 'email'], ['John Doe', 'john@example.com'])
+        $resultUser = $insert->into('Users')
+            ->set(['username', 'email'], ['John Doe', 'john@example.com'])
             ->execute($db);
-        if (!$result) {
-            throw new Exception('Data insertion failed.');
+        if (!$resultUser) {
+            throw new Exception('User insertion failed.');
+        }
+        $resultPost = $insert->into('Posts')
+            ->set(['user_id', 'content'], [1, 'This is a test post.'])
+            ->execute($db);
+        if (!$resultPost) {
+            throw new Exception('Post insertion failed.');
         }
         echo 'Insertion successful.';
     }

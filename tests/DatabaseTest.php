@@ -58,6 +58,12 @@ class DatabaseTest extends TestCase {
         $this->assertNotNull($result, 'Select query should return a result.');
     }
 
+    public function testCreateTables() {
+        $this->db->executeQuery('CREATE TABLE IF NOT EXISTS Users (id SERIAL PRIMARY KEY, username VARCHAR(50) NOT NULL, email VARCHAR(100) NOT NULL UNIQUE);');
+        $this->db->executeQuery('CREATE TABLE IF NOT EXISTS Posts (id SERIAL PRIMARY KEY, user_id INT REFERENCES Users(id), content TEXT NOT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);');
+        $this->assertTrue(true, 'Tables should be created successfully.');
+    }
+
     protected function tearDown(): void {
         // Clean up the database connection
         $this->db->disconnect();

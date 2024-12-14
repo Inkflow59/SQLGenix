@@ -13,9 +13,14 @@ class SQLSelectTest extends TestCase {
         $this->select = new SQLSelect($this->db);
     }
 
-    public function testSelect() {
-        $result = $this->select->from('test_table')->execute();
-        // Add assertions to verify the select operation
+    public function testSelectUser() {
+        $result = $this->select->from('Users')->execute();
+        $this->assertNotEmpty($result, 'User selection should return results.');
+    }
+
+    public function testSelectPost() {
+        $result = $this->select->from('Posts')->execute();
+        $this->assertNotEmpty($result, 'Post selection should return results.');
     }
 
     protected function tearDown(): void {
