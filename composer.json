@@ -10,6 +10,9 @@
     "require-dev": {
         "phpunit/phpunit": "^9.0"
     },
+    {
+    "license": "MIT"
+    },
     "autoload": {
         "psr-4": {
             "SQLGenix\\": "src/"
