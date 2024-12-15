@@ -2,6 +2,7 @@
     "name": "sqlgenix/sqlgenix",
     "description": "A PHP library that simplifies the construction of SQL queries for dynamic web applications.",
     "type": "library",
+    "license": "MIT",
     "require": {
         "php": ">=7.1",
         "ext-mysqli": "*",
@@ -9,9 +10,6 @@
     },
     "require-dev": {
         "phpunit/phpunit": "^9.0"
-    },
-    {
-    "license": "MIT"
     },
     "autoload": {
         "psr-4": {
