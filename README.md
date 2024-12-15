@@ -47,7 +47,7 @@ Here are some examples of how to use SQLGenix:
 ```php
 require 'src/SQLInsert.php';
 
-$db = new Database(); // Assume Database is a class that handles DB connection
+$db = new Database();
 $insert = new SQLInsert($db);
 $insert->into('users')
        ->set(['name', 'email'], ['John Doe', 'john@example.com'])
