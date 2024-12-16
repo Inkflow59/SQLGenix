@@ -29,7 +29,7 @@ SQLGenix is a powerful and flexible SQL query generator designed to simplify dat
 To install SQLGenix, you can use Composer:
 
 ```bash
-composer require inkflow59/sqlgenix
+composer require sqlgenix/sqlgenix
 ```
 
 Alternatively, you can clone the repository:
