@@ -26,7 +26,13 @@ SQLGenix is a powerful and flexible SQL query generator designed to simplify dat
 - **Lightweight and Fast**: Optimized for performance, ensuring quick execution of queries.
 
 ## Installation
-To install SQLGenix, follow these steps:
+To install SQLGenix, you can use Composer:
+
+```bash
+composer require inkflow59/sqlgenix
+```
+
+Alternatively, you can clone the repository:
 1. Clone the repository:
    ```bash
    git clone https://github.com/Inkflow59/SQLGenix.git
