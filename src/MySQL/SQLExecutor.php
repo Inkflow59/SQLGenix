@@ -4,8 +4,6 @@
  *
  * This class is responsible for executing SQL queries against a database.
  * It provides methods to perform various SQL operations such as SELECT, INSERT, UPDATE, and DELETE.
- *
- * @package SQLFlow
  */
 require_once 'Database.php';
 
