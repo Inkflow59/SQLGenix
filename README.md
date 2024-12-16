@@ -29,7 +29,7 @@ SQLGenix is a powerful and flexible SQL query generator designed to simplify dat
 To install SQLGenix, follow these steps:
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/SQLGenix.git
+   git clone https://github.com/Inkflow59/SQLGenix.git
    ```
 2. Navigate to the project directory:
    ```bash
