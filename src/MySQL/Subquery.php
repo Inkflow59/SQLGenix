@@ -140,5 +140,3 @@ class Subquery {
         return $this->build();
     }
 }
-
-?>
