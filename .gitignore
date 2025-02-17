@@ -1,0 +1,44 @@
+# Composer dependencies
+/vendor/
+
+# PHPUnit
+.phpunit.result.cache
+.phpunit.cache/
+
+# IDE files
+.idea/
+.vscode/
+*.sublime-workspace
+*.sublime-project
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs and databases
+*.log
+*.sqlite
+*.sql
+!examples/setup_database.sql
+!tests/setup_database.sql
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Cache and temp files
+*.cache
+*.tmp
+/tmp/
+/temp/
+
+# Backup files
+*.bak
+*.swp
+*~
