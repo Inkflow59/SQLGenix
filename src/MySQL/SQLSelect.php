@@ -1,4 +1,5 @@
 <?php
+require_once '../QueryCache.php';
 /**
  * SQLSelect class to build SQL select statements.
  */
@@ -70,11 +71,37 @@ class SQLSelect {
     private $subquery;
 
     /**
+     * Limit for the select statement.
+     * @var int
+     */
+    private $limit = null;
+    
+    /**
+     * Offset for the select statement.
+     * @var int
+     */
+    private $offset = null;
+
+    /**
+     * Query cache instance.
+     * @var QueryCache
+     */
+    private $cache = null;
+
+    /**
+     * Union queries for the select statement.
+     * @var array
+     */
+    private $unions = [];
+
+    /**
      * Constructor
      * @param Database $db Database connection instance
+     * @param QueryCache $cache Optional query cache instance
      */
-    public function __construct(Database $db) {
+    public function __construct(Database $db, QueryCache $cache = null) {
         $this->db = $db;
+        $this->cache = $cache;
     }
     
     /**
@@ -182,6 +209,70 @@ class SQLSelect {
     }
     
     /**
+     * Add a LIMIT clause to the select statement.
+     * 
+     * @param int $limit Maximum number of records to return.
+     * @return SQLSelect
+     */
+    public function limit($limit) {
+        $this->limit = (int)$limit;
+        return $this;
+    }
+    
+    /**
+     * Add an OFFSET clause to the select statement.
+     * 
+     * @param int $offset Number of records to skip.
+     * @return SQLSelect
+     */
+    public function offset($offset) {
+        $this->offset = (int)$offset;
+        return $this;
+    }
+    
+    /**
+     * Add pagination to the select statement.
+     * 
+     * @param int $page Page number (1-based).
+     * @param int $perPage Number of records per page.
+     * @return SQLSelect
+     */
+    public function paginate($page, $perPage) {
+        $this->limit = (int)$perPage;
+        $this->offset = ((int)$page - 1) * (int)$perPage;
+        return $this;
+    }
+    
+    /**
+     * Add a UNION clause to combine with another query.
+     * 
+     * @param SQLSelect|string $query Another SQLSelect instance or raw SQL query
+     * @param bool $all Whether to use UNION ALL (default: false for UNION)
+     * @return SQLSelect
+     */
+    public function union($query, $all = false) {
+        $unionType = $all ? 'UNION ALL' : 'UNION';
+        
+        if ($query instanceof SQLSelect) {
+            $this->unions[] = $unionType . ' (' . $query->build() . ')';
+        } else {
+            $this->unions[] = $unionType . ' (' . $query . ')';
+        }
+        
+        return $this;
+    }
+    
+    /**
+     * Add a UNION ALL clause to combine with another query.
+     * 
+     * @param SQLSelect|string $query Another SQLSelect instance or raw SQL query
+     * @return SQLSelect
+     */
+    public function unionAll($query) {
+        return $this->union($query, true);
+    }
+    
+    /**
      * Add a subquery to the select statement.
      * 
      * @param string $subquery The subquery to include.
@@ -245,11 +336,43 @@ class SQLSelect {
     }
 
     /**
+     * Generate a unique key for the current query builder state.
+     * 
+     * @return string Unique key representing the current query state
+     */
+    private function generateCacheKey() {
+        $state = [
+            'columns' => $this->columns,
+            'table' => $this->table,
+            'conditions' => $this->conditions,
+            'joins' => $this->joins,
+            'groupByColumns' => $this->groupByColumns,
+            'havingCondition' => $this->havingCondition,
+            'orderByColumns' => $this->orderByColumns,
+            'orderByDirection' => $this->orderByDirection,
+            'subqueries' => $this->subqueries,
+            'limit' => $this->limit,
+            'offset' => $this->offset,
+            'unions' => $this->unions
+        ];
+        return md5(serialize($state));
+    }
+
+    /**
      * Build the SQL select statement.
      * 
      * @return string
      */
     public function build() {
+        // Check cache first if available
+        if ($this->cache && $this->cache->isEnabled()) {
+            $cacheKey = $this->generateCacheKey();
+            $cachedQuery = $this->cache->getCachedQuery($cacheKey);
+            if ($cachedQuery !== null) {
+                return $cachedQuery;
+            }
+        }
+        
         $query = "SELECT " . implode(", ", array_merge($this->columns, $this->subqueries)) . " FROM " . $this->table;
         if (!empty($this->joins)) {
             $query .= ' ' . implode(' ', $this->joins);
@@ -266,9 +389,27 @@ class SQLSelect {
         if (!empty($this->havingCondition)) {
             $query .= " HAVING " . $this->havingCondition;
         }
+        
+        // Add UNION clauses
+        if (!empty($this->unions)) {
+            $query .= ' ' . implode(' ', $this->unions);
+        }
+        
         if (!empty($this->orderByColumns)) {
             $query .= " ORDER BY " . implode(", ", $this->orderByColumns) . " " . $this->orderByDirection;
         }
+        if ($this->limit !== null) {
+            $query .= " LIMIT " . $this->limit;
+        }
+        if ($this->offset !== null) {
+            $query .= " OFFSET " . $this->offset;
+        }
+        
+        // Cache the built query if cache is available
+        if ($this->cache && $this->cache->isEnabled()) {
+            $this->cache->cacheQuery($cacheKey, $query);
+        }
+        
         return $query;
     }
     
@@ -288,9 +429,45 @@ class SQLSelect {
      */
     public function execute() {
         $query = $this->getQuery();
+        
+        // Check result cache first if available
+        if ($this->cache && $this->cache->isEnabled()) {
+            $cachedResult = $this->cache->getCachedResult($query, []);
+            if ($cachedResult !== null) {
+                $this->db->getLogger()->log("Cache hit for query: $query");
+                return $cachedResult;
+            }
+        }
+        
         $result = $this->db->executeQuery($query);
         $this->db->getLogger()->log("Execution of query: $query"); // Log the query execution
+        
+        // Cache the result if cache is available
+        if ($this->cache && $this->cache->isEnabled()) {
+            $this->cache->cacheResult($query, [], $result);
+        }
+        
         return $result;
+    }
+
+    /**
+     * Set the query cache instance.
+     * 
+     * @param QueryCache $cache Query cache instance
+     * @return SQLSelect
+     */
+    public function setCache(QueryCache $cache) {
+        $this->cache = $cache;
+        return $this;
+    }
+
+    /**
+     * Get the query cache instance.
+     * 
+     * @return QueryCache|null
+     */
+    public function getCache() {
+        return $this->cache;
     }
 
     /**
